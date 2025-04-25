@@ -1,9 +1,23 @@
 import Image from "next/image";
 import React from 'react';
 
+interface ImageWithTextProps {
+  src: string;
+  alt: string;
+  text?: string;
+  width: number;
+  height: number;
+  className?: string;
+}
 
-
-const ImageWithText = ({ src, alt, text, width, height, className }) => {
+const ImageWithText: React.FC<ImageWithTextProps> = ({ 
+  src, 
+  alt, 
+  text, 
+  width, 
+  height, 
+  className 
+}) => {
   return (
     <div className="relative w-full h-full overflow-hidden object-contain rounded-[34px]">
       <Image
@@ -23,4 +37,4 @@ const ImageWithText = ({ src, alt, text, width, height, className }) => {
   );
 };
 
-export default ImageWithText;
+export default ImageWithText; 

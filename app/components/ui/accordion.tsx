@@ -1,16 +1,31 @@
 'use client';
 import React, { useState } from 'react';
 
-const Accordion = ({ sections, mode, }) => {
-  const [openSection, setOpenSection] = useState(null);
+interface AccordionImage {
+  src: string;
+  alt?: string;
+}
 
-  const toggleSection = (index) => {
+interface AccordionSection {
+  title: string;
+  steps?: string[];
+  images?: AccordionImage[] | string[];
+}
+
+interface AccordionProps {
+  sections: AccordionSection[];
+  mode: 'steps' | 'images';
+}
+
+const Accordion: React.FC<AccordionProps> = ({ sections, mode }) => {
+  const [openSection, setOpenSection] = useState<number | null>(null);
+
+  const toggleSection = (index: number) => {
     setOpenSection(openSection === index ? null : index);
   };
 
   return (
-    <div className="w-full  bg-white">
-
+    <div className="w-full bg-white">
       <div className="space-y-4">
         {sections.map((section, index) => (
           <div key={index}>
@@ -20,7 +35,6 @@ const Accordion = ({ sections, mode, }) => {
                 onClick={() => toggleSection(index)}
               >
                 <h2 className="text-xl lg:text-4xl font-medium">+ {section.title}</h2>
-
               </div>
               {openSection === index && mode === 'steps' && section.steps && (
                 <ol className="list-decimal text-lg lg:text-2xl list-inside space-y-2 mt-4">
@@ -35,8 +49,8 @@ const Accordion = ({ sections, mode, }) => {
                 {section.images.map((image, imageIndex) => (
                   <img
                     key={imageIndex}
-                    src={image}
-                    alt={`Image ${imageIndex + 1}`}
+                    src={typeof image === 'string' ? image : image.src}
+                    alt={typeof image === 'string' ? `Image ${imageIndex + 1}` : (image.alt || `Image ${imageIndex + 1}`)}
                     className="w-full rounded-3xl h-auto"
                   />
                 ))}
@@ -47,6 +61,6 @@ const Accordion = ({ sections, mode, }) => {
       </div>
     </div>
   );
-}
+};
 
-export default Accordion
+export default Accordion; 

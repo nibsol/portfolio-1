@@ -1,8 +1,20 @@
 import React from 'react';
 
+interface InputFieldProps {
+  id: string;
+  name: string;
+  type?: 'text' | 'email' | 'password' | 'tel' | 'number';
+  placeholder: string;
+  required?: boolean;
+}
 
-
-const InputField = ({ id, name, type = 'text', placeholder, required }) => {
+const InputField: React.FC<InputFieldProps> = ({ 
+  id, 
+  name, 
+  type = 'text', 
+  placeholder, 
+  required 
+}) => {
   return (
     <div>
       <label htmlFor={id} className="sr-only">{placeholder.replace('*', '')}</label>
@@ -18,4 +30,4 @@ const InputField = ({ id, name, type = 'text', placeholder, required }) => {
   );
 };
 
-export default InputField;
+export default InputField; 

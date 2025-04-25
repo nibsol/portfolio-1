@@ -4,7 +4,16 @@
     "baseUrl": ".", 
     "paths": {
       "@/*": ["./*"],
-      "@components/*": ["./components/*"]
+      "@/components/*": ["./app/components/*"],
+      "@/ui/*": ["./app/components/ui/*"],
+      "@/sections/*": ["./app/components/sections/*"],
+      "@/layout/*": ["./app/components/layout/*"],
+      "@/hooks/*": ["./app/hooks/*"],
+      "@/lib/*": ["./app/lib/*"],
+      "@/styles/*": ["./app/styles/*"],
+      "@/assets/*": ["./app/assets/*"],
+      "@/mock/*": ["./app/mock/*"],
+      "@/fonts/*": ["./app/fonts/*"]
     }
   }
 }
