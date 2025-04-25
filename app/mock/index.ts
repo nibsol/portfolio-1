@@ -79,54 +79,8 @@ const DESIGN_FLOW = [
       ]
     },
   ];
-  
-  const CASE_STUDIES = [
-    {
-      title: "AI Automation Platform",
-      slug: "ai-automation-platform",
-      description: "A comprehensive solution for business process automation using AI",
-      tags: ["AI", "Automation", "SaaS"],
-      image: "/images/project1.jpg"
-    },
-    {
-      title: "EdTech Learning System",
-      slug: "edtech-learning-system",
-      description: "An adaptive learning platform for personalized education",
-      tags: ["Education", "AI", "UX/UI"],
-      image: "/images/project2.jpg"
-    },
-    {
-      title: "SaaS Dashboard",
-      slug: "saas-dashboard",
-      description: "A powerful analytics dashboard for SaaS businesses",
-      tags: ["SaaS", "Analytics", "Dashboard"],
-      image: "/images/project3.jpg"
-    },
-    {
-      title: "AI Content Generator",
-      slug: "ai-content-generator",
-      description: "Smart content creation tools for marketing teams",
-      tags: ["AI", "Content", "Marketing"],
-      image: "/images/project4.jpg"
-    },
-    {
-      title: "Workflow Automation Suite",
-      slug: "workflow-automation",
-      description: "End-to-end automation for complex business workflows",
-      tags: ["Automation", "Enterprise", "API"],
-      image: "/images/project5.jpg"
-    },
-    {
-      title: "E-Learning Platform",
-      slug: "e-learning-platform",
-      description: "Comprehensive online learning environment with AI-powered recommendations",
-      tags: ["Education", "Platform", "UX/UI"],
-      image: "/images/project6.jpg"
-    }
-  ];
 
   export {
     DESIGN_FLOW,
-    SINCE_2018,
-    CASE_STUDIES
+    SINCE_2018
   }

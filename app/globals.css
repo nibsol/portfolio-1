@@ -75,3 +75,28 @@
   }
 }
 
+
+/* Navbar styles */
+@layer components {
+  .nav-link {
+    @apply relative font-medium text-sm transition-colors overflow-hidden;
+  }
+  
+  .nav-link::after {
+    @apply content-[''] absolute w-0 h-0.5 bg-primary left-1/2 -translate-x-1/2 -bottom-1 transition-all duration-300;
+  }
+  
+  .nav-link:hover::after {
+    @apply w-[80%];
+  }
+
+  /* Active link style */
+  .nav-link.active {
+    @apply text-primary;
+  }
+  
+  .nav-link.active::after {
+    @apply w-[80%];
+  }
+}
+

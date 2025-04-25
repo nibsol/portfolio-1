@@ -156,23 +156,7 @@ const Contact = () => {
           </div>
         </div>
       </div>
-      
-      <div className="mt-20">
-        <Cta10 
-          heading="Ready to Transform Your Business with Nibsol?" 
-          description="Join innovative businesses using our AI solutions to automate processes, enhance learning experiences, and build powerful SaaS products."
-          buttons={{
-            primary: {
-              text: "Get Started",
-              url: "#contact",
-            },
-            secondary: {
-              text: "Learn More",
-              url: "#services",
-            },
-          }}
-        />
-      </div>
+    
     </section>
   );
 };

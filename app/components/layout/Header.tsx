@@ -1,78 +1,130 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Menu, X, ChevronDown } from "lucide-react";
 
 const navItems = [
   { title: "Home", href: "/" },
   { title: "AI Solutions", href: "#ai-solutions" },
   { title: "Services", href: "#services" },
-  { title: "Work", href: "#work" },
   { title: "Contact", href: "#contact" },
 ];
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
+  
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const offset = window.scrollY;
+      setScrolled(offset > 50);
+      
+      // Update active section based on scroll position
+      const sections = document.querySelectorAll("section[id]");
+      sections.forEach((section) => {
+        const sectionTop = (section as HTMLElement).offsetTop - 100;
+        const sectionHeight = (section as HTMLElement).offsetHeight;
+        const sectionId = section.getAttribute("id") || "";
+        
+        if (offset >= sectionTop && offset < sectionTop + sectionHeight) {
+          setActiveSection(sectionId);
+        }
+      });
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
   
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="font-bold text-2xl bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">Nibsol</span>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 
+      ${scrolled 
+        ? "bg-background/95 backdrop-blur-md shadow-md py-1" 
+        : "bg-transparent py-2"}`}
+    >
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between h-12">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2 z-50 group">
+            <span className="font-bold text-xl bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent 
+                           transition-all duration-300 group-hover:scale-110">
+              Nibsol
+              <span className="absolute -mt-1 ml-0.5 h-1.5 w-1.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 
+                              animate-pulse"></span>
+            </span>
           </Link>
-        </div>
-        
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex gap-6">
-          {navItems.map((item, index) => (
-            <Link
-              key={index}
-              href={item.href}
-              className="text-sm font-medium transition-colors hover:text-primary"
-            >
-              {item.title}
-            </Link>
-          ))}
-          <Link 
-            href="#contact"
-            className="text-sm font-medium bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-md"
-          >
-            Get Started
-          </Link>
-        </nav>
-        
-        {/* Mobile Menu Button */}
-        <button
-          className="flex md:hidden items-center justify-center rounded-md p-2 text-foreground"
-          onClick={toggleMenu}
-        >
-          {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
-      </div>
-      
-      {/* Mobile Navigation */}
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="container py-4 pb-6 space-y-2">
-            {navItems.map((item, index) => (
-              <Link
-                key={index}
-                href={item.href}
-                className="block py-2 text-base font-medium hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.title}
-              </Link>
-            ))}
+          
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden md:flex absolute left-1/2 transform -translate-x-1/2">
+            <div className="flex rounded-full bg-white/10 backdrop-blur-sm border border-white/20 px-1.5 py-0.5">
+              {navItems.map((item, index) => {
+                const isActive = item.href === "/" 
+                  ? activeSection === "home" 
+                  : item.href.replace("#", "") === activeSection;
+                  
+                return (
+                  <Link
+                    key={index}
+                    href={item.href}
+                    className={`nav-link text-center px-3 py-1.5 rounded-full hover:bg-white/10 ${isActive ? 'active' : ''}`}
+                  >
+                    <span className="relative z-10">{item.title}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </nav>
+          
+          {/* CTA Button */}
+          <div className="hidden md:block">
             <Link 
               href="#contact"
-              className="block py-2 mt-2 text-center text-base font-medium bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-md"
+              className="text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-600 hover:opacity-90 text-white px-4 py-1.5 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
+            >
+              Get Started
+            </Link>
+          </div>
+          
+          {/* Mobile Menu Button */}
+          <button
+            className="flex md:hidden items-center justify-center rounded-full p-1.5 text-foreground z-50"
+            onClick={toggleMenu}
+          >
+            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+        </div>
+      </div>
+      
+      {/* Mobile Navigation - Fullscreen */}
+      {isMenuOpen && (
+        <div className="md:hidden fixed inset-0 bg-background/95 backdrop-blur-md flex items-center justify-center z-40">
+          <div className="flex flex-col items-center space-y-5 py-4">
+            {navItems.map((item, index) => {
+              const isActive = item.href === "/" 
+                ? activeSection === "home" 
+                : item.href.replace("#", "") === activeSection;
+                
+              return (
+                <Link
+                  key={index}
+                  href={item.href}
+                  className={`text-xl transition-colors hover:text-primary ${isActive ? 'text-primary' : ''}`}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.title}
+                </Link>
+              );
+            })}
+            <Link 
+              href="#contact"
+              className="mt-3 text-base font-medium bg-gradient-to-r from-blue-500 to-purple-600 hover:opacity-90 text-white px-6 py-2 rounded-full transition-all duration-300 hover:shadow-lg"
               onClick={() => setIsMenuOpen(false)}
             >
               Get Started
