@@ -168,7 +168,7 @@ const FAQSection = React.memo(() => {
   };
 
   return (
-    <section ref={sectionRef} className="relative py-16 md:py-24 overflow-hidden bg-gradient-to-b from-white to-slate-50 dark:from-slate-950 dark:to-slate-900">
+    <section id="faq" ref={sectionRef} className="relative py-16 md:py-24 overflow-hidden bg-gradient-to-b from-white to-slate-50 dark:from-slate-950 dark:to-slate-900">
       <div className="absolute inset-0 z-0 opacity-40">
         <SparklesCore
           id="sparkles-faq"

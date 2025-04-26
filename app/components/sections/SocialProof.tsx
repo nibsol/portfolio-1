@@ -171,7 +171,7 @@ const SocialProof = () => {
   }, []);
 
   return (
-    <section className="relative py-12 md:py-20 overflow-hidden bg-gradient-to-b from-slate-50 to-indigo-50 dark:from-slate-900 dark:to-indigo-950">
+    <section id="social-proof" className="relative py-12 md:py-20 overflow-hidden bg-gradient-to-b from-slate-50 to-indigo-50 dark:from-slate-900 dark:to-indigo-950">
       <div className="absolute inset-0 z-0">
         <SparklesCore
           id="sparkles-social"
