@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import useDarkMode from "@/app/hooks/useDarkMode";
 import Hero from "@/app/components/sections/Hero";
+import HowItWorks from "@/app/components/sections/HowItWorks";
 import AISolutions from "@/app/components/sections/AISolutions";
 import Contact from "@/app/components/sections/Contact";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/app/components/ui/accordion";
@@ -23,6 +24,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <HowItWorks />
       <AISolutions />
       <section className="py-20 container mx-auto px-4">
         <div className="text-center mb-16">

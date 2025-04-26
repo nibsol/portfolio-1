@@ -126,8 +126,11 @@ const Hero = () => {
               size="lg"
               variant="outline"
               className="backdrop-blur-sm bg-white/5 hover:bg-white/10 transition-all hover:scale-105 duration-300 border-white/20 rounded-full font-medium"
+              asChild
             >
-              See How It Works →
+              <Link href="#how-it-works">
+                See How It Works →
+              </Link>
             </Button>
           </motion.div>
         </motion.div>
@@ -155,9 +158,11 @@ const Hero = () => {
           animate={{ y: [0, 8, 0] }}
           transition={{ repeat: Infinity, duration: 1.5 }}
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-down">
-            <path d="m6 9 6 6 6-6"/>
-          </svg>
+          <Link href="#how-it-works" className="flex items-center justify-center cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-chevron-down">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </Link>
         </motion.div>
       </motion.div>
       

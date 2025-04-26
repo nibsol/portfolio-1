@@ -6,6 +6,7 @@ import { Menu, X, ChevronDown } from "lucide-react";
 
 const navItems = [
   { title: "Home", href: "/" },
+  { title: "How It Works", href: "#how-it-works" },
   { title: "AI Solutions", href: "#ai-solutions" },
   { title: "Services", href: "#services" },
   { title: "Contact", href: "#contact" },
