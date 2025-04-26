@@ -5,6 +5,7 @@ import useDarkMode from "@/app/hooks/useDarkMode";
 import Hero from "@/app/components/sections/Hero";
 import HowItWorks from "@/app/components/sections/HowItWorks";
 import WhyNibsol from "@/app/components/sections/WhyNibsol";
+import IndustriesTransform from "@/app/components/sections/IndustriesTransform";
 import Contact from "@/app/components/sections/Contact";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/app/components/ui/accordion";
 
@@ -26,6 +27,7 @@ export default function Home() {
       <Hero />
       <HowItWorks />
       <WhyNibsol />
+      <IndustriesTransform />
       <section className="py-20 container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold mb-4">Frequently Asked Questions</h2>
