@@ -53,10 +53,10 @@ const Header = () => {
         <div className="flex items-center justify-between h-12">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 z-50 group">
-            <span className="font-bold text-xl bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent 
+            <span className="font-bold text-xl bg-gradient-to-r from-[#3B82F6] to-[#6366F1] bg-clip-text text-transparent 
                            transition-all duration-300 group-hover:scale-110">
               Nibsol
-              <span className="absolute -mt-1 ml-0.5 h-1.5 w-1.5 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 
+              <span className="absolute -mt-1 ml-0.5 h-1.5 w-1.5 rounded-full bg-gradient-to-r from-[#3B82F6] to-[#6366F1] 
                               animate-pulse"></span>
             </span>
           </Link>
@@ -73,7 +73,7 @@ const Header = () => {
                   <Link
                     key={index}
                     href={item.href}
-                    className={`nav-link text-center px-3 py-1.5 rounded-full hover:bg-white/10 ${isActive ? 'active' : ''}`}
+                    className={`nav-link text-center px-3 py-1.5 rounded-full hover:bg-white/10 ${isActive ? 'text-[#3B82F6]' : 'text-white'}`}
                   >
                     <span className="relative z-10">{item.title}</span>
                   </Link>
@@ -86,7 +86,7 @@ const Header = () => {
           <div className="hidden md:block">
             <Link 
               href="#contact"
-              className="text-sm font-medium bg-gradient-to-r from-blue-500 to-purple-600 hover:opacity-90 text-white px-4 py-1.5 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-primary/20"
+              className="text-sm font-medium bg-gradient-to-r from-[#3B82F6] to-[#6366F1] hover:scale-105 text-white px-4 py-1.5 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-[#3B82F6]/20"
             >
               Get Started
             </Link>
@@ -115,7 +115,7 @@ const Header = () => {
                 <Link
                   key={index}
                   href={item.href}
-                  className={`text-xl transition-colors hover:text-primary ${isActive ? 'text-primary' : ''}`}
+                  className={`text-xl transition-colors hover:text-[#3B82F6] ${isActive ? 'text-[#3B82F6]' : 'text-white'}`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.title}
@@ -124,7 +124,7 @@ const Header = () => {
             })}
             <Link 
               href="#contact"
-              className="mt-3 text-base font-medium bg-gradient-to-r from-blue-500 to-purple-600 hover:opacity-90 text-white px-6 py-2 rounded-full transition-all duration-300 hover:shadow-lg"
+              className="mt-3 text-base font-medium bg-gradient-to-r from-[#3B82F6] to-[#6366F1] hover:scale-105 text-white px-6 py-2 rounded-full transition-all duration-300 hover:shadow-lg"
               onClick={() => setIsMenuOpen(false)}
             >
               Get Started
