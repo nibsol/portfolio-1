@@ -1,75 +1,151 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, memo } from "react";
 import { motion, useAnimation, useInView } from "framer-motion";
 import { useRef } from "react";
 import { SparklesCore } from "@/app/components/ui/sparkles";
+import { isLowEndDevice, throttle } from "@/app/lib/performance";
+import { useCounter } from "@/app/lib/useCounter";
+
+// Memoized testimonial card component for better performance
+const TestimonialCard = memo(({ testimonial, variants }: { 
+  testimonial: { quote: string; author: string; role: string }; 
+  variants: any;
+}) => (
+  <motion.div
+    className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-indigo-100 dark:border-indigo-900 rounded-xl p-6 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300"
+    variants={variants}
+  >
+    <div className="text-indigo-500 dark:text-indigo-400 text-4xl font-serif mb-2">"</div>
+    <p className="italic text-slate-700 dark:text-slate-300 mb-4">
+      {testimonial.quote}
+    </p>
+    <div className="mt-4">
+      <p className="font-semibold">{testimonial.author}</p>
+      <p className="text-sm text-slate-500 dark:text-slate-400">{testimonial.role}</p>
+    </div>
+  </motion.div>
+));
+
+// Add display name for React DevTools
+TestimonialCard.displayName = "TestimonialCard";
+
+// Badge component for floating animations
+const FloatingBadge = memo(({ text, color, delay = 0 }: { 
+  text: string; 
+  color: "indigo" | "purple" | "blue" | "green"; // Restricted color types
+  delay?: number 
+}) => {
+  const [reducedMotion, setReducedMotion] = useState(false);
+  
+  useEffect(() => {
+    setReducedMotion(isLowEndDevice());
+  }, []);
+  
+  // Get proper tailwind classes based on color
+  const getColorClasses = (color: string) => {
+    switch(color) {
+      case 'indigo':
+        return "bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300";
+      case 'purple':
+        return "bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300";
+      case 'blue':
+        return "bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300";
+      case 'green':
+        return "bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-300";
+      default:
+        return "bg-gray-100 dark:bg-gray-900/50 text-gray-800 dark:text-gray-300";
+    }
+  };
+  
+  // Skip animation for low-end devices
+  if (reducedMotion) {
+    return (
+      <div className={`${getColorClasses(color)} px-3 py-1 rounded-full text-sm font-medium`}>
+        {text}
+      </div>
+    );
+  }
+  
+  return (
+    <motion.div
+      className={`${getColorClasses(color)} px-3 py-1 rounded-full text-sm font-medium`}
+      animate={{
+        y: [0, -5, 0], // Reduced animation range
+      }}
+      transition={{
+        duration: 3, // Slower animation
+        repeat: Infinity,
+        ease: "easeInOut",
+        delay
+      }}
+    >
+      {text}
+    </motion.div>
+  );
+});
+
+FloatingBadge.displayName = "FloatingBadge";
 
 const SocialProof = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isInView = useInView(containerRef, { once: true, amount: 0.3 });
   const controls = useAnimation();
   
-  // Number counter animation
-  const [count, setCount] = useState(0);
-  const targetCount = 23;
+  // Replace manual counter with useCounter hook
+  const [reducedMotion, setReducedMotion] = useState(false);
   
+  useEffect(() => {
+    setReducedMotion(isLowEndDevice());
+  }, []);
+  
+  // Use the optimized counter hook with appropriate settings
+  const { value: count, start } = useCounter({
+    start: 0,
+    end: 23,
+    duration: reducedMotion ? 0 : 1500, // Skip animation for reduced motion
+    easing: "easeOutExpo", // Fast start, smooth end
+    enabled: isInView, // Only run when in view
+    autoStart: true, // Start automatically when enabled becomes true
+    throttle: 60 // Throttle updates for performance
+  });
+
   useEffect(() => {
     if (isInView) {
       controls.start("visible");
-      
-      // Animate counter when in view
-      if (count < targetCount) {
-        const timer = setTimeout(() => {
-          setCount(prev => Math.min(prev + 1, targetCount));
-        }, 60);
-        return () => clearTimeout(timer);
-      }
     }
-  }, [isInView, controls, count]);
+  }, [isInView, controls]);
 
-  // Variants for animations
+  // Variants for animations - simplified for performance
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
+        staggerChildren: reducedMotion ? 0.05 : 0.1,
+        delayChildren: 0.1
       }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: reducedMotion ? 10 : 20 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.6,
-        ease: [0.25, 0.1, 0.25, 1.0]
+        duration: reducedMotion ? 0.3 : 0.6,
+        ease: "easeOut"
       }
     }
   };
 
+  // Simplified heading without letter-by-letter animation for better performance
   const headlineVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.05
-      }
-    }
-  };
-
-  const letterVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.4
-      }
+      transition: { duration: 0.5 }
     }
   };
 
@@ -87,6 +163,12 @@ const SocialProof = () => {
   ];
 
   const headline = "1,200+ Hours Saved. 0 Excuses Made.";
+  
+  // Memoized click handler to prevent unnecessary re-renders
+  const handleSeeMoreClick = useCallback(() => {
+    console.log("See more clicked");
+    // Add your navigation or modal logic here
+  }, []);
 
   return (
     <section className="relative py-12 md:py-20 overflow-hidden bg-gradient-to-b from-slate-50 to-indigo-50 dark:from-slate-900 dark:to-indigo-950">
@@ -95,8 +177,8 @@ const SocialProof = () => {
           id="sparkles-social"
           background="transparent"
           minSize={0.4}
-          maxSize={1}
-          particleDensity={8}
+          maxSize={0.8} // Reduced from 1
+          particleDensity={reducedMotion ? 3 : 5} // Reduced from 8
           className="w-full h-full"
           particleColor="hsl(var(--primary))"
           speed={0.1}
@@ -113,37 +195,24 @@ const SocialProof = () => {
           animate={controls}
           variants={containerVariants}
         >
-          {/* Header */}
+          {/* Header - simplified animation */}
           <motion.h2 
             className="text-center text-3xl md:text-5xl font-bold mb-4"
             variants={headlineVariants}
           >
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-              {headline.split("").map((letter, index) => (
-                <motion.span key={index} variants={letterVariants}>
-                  {letter}
-                </motion.span>
-              ))}
+              {headline}
             </span>
           </motion.h2>
           
           {/* Testimonial Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12">
             {testimonials.map((testimonial, index) => (
-              <motion.div
+              <TestimonialCard 
                 key={index}
-                className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border border-indigo-100 dark:border-indigo-900 rounded-xl p-6 shadow-sm hover:shadow-md hover:scale-[1.02] transition-all duration-300"
+                testimonial={testimonial}
                 variants={itemVariants}
-              >
-                <div className="text-indigo-500 dark:text-indigo-400 text-4xl font-serif mb-2">"</div>
-                <p className="italic text-slate-700 dark:text-slate-300 mb-4">
-                  {testimonial.quote}
-                </p>
-                <div className="mt-4">
-                  <p className="font-semibold">{testimonial.author}</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">{testimonial.role}</p>
-                </div>
-              </motion.div>
+              />
             ))}
           </div>
           
@@ -157,6 +226,7 @@ const SocialProof = () => {
                 className="text-3xl md:text-4xl font-bold text-indigo-600 dark:text-indigo-400"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
               >
                 {count}
               </motion.span>
@@ -166,46 +236,28 @@ const SocialProof = () => {
             </div>
           </motion.div>
           
-          {/* Floating Badges */}
-          <div className="absolute top-10 right-10 opacity-50">
-            <motion.div
-              className="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-800 dark:text-indigo-300 px-3 py-1 rounded-full text-sm font-medium"
-              animate={{
-                y: [0, -10, 0],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              Time Saved
-            </motion.div>
-          </div>
-          
-          <div className="absolute bottom-20 left-20 opacity-50">
-            <motion.div
-              className="bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300 px-3 py-1 rounded-full text-sm font-medium"
-              animate={{
-                y: [0, -10, 0],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1
-              }}
-            >
-              Automation
-            </motion.div>
-          </div>
+          {/* Simplified floating badges */}
+          {!reducedMotion && (
+            <>
+              <div className="absolute top-10 right-10 opacity-50">
+                <FloatingBadge text="Time Saved" color="indigo" />
+              </div>
+              
+              <div className="absolute bottom-20 left-20 opacity-50">
+                <FloatingBadge text="Automation" color="purple" delay={1} />
+              </div>
+            </>
+          )}
           
           {/* See more button */}
           <motion.div 
             className="mt-10 text-center"
             variants={itemVariants}
           >
-            <button className="group inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium transition-colors">
+            <button 
+              onClick={handleSeeMoreClick}
+              className="group inline-flex items-center text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium transition-colors"
+            >
               See more success stories
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -224,4 +276,4 @@ const SocialProof = () => {
   );
 };
 
-export default SocialProof; 
+export default memo(SocialProof); 

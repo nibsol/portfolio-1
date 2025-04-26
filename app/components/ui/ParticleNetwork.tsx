@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, memo, useState, useMemo } from 'react';
+import { isLowEndDevice, throttle } from '@/app/lib/performance';
 
 interface Particle {
   x: number;
@@ -26,7 +27,7 @@ interface ParticleNetworkProps {
   interactive?: boolean;
 }
 
-const ParticleNetwork = ({
+const ParticleNetwork = memo(({
   background = 'transparent',
   minSize = 0.5,
   maxSize = 2,
@@ -45,12 +46,26 @@ const ParticleNetwork = ({
   const animationRef = useRef<number>(0);
   const mouseRef = useRef({ x: 0, y: 0, isActive: false });
   const canvasSizeRef = useRef({ width: 0, height: 0 });
+  const [lowEndDevice, setLowEndDevice] = useState(false);
+
+  // Optimize particle density based on device capability
+  const optimizedDensity = useMemo(() => {
+    return lowEndDevice ? Math.round(particleDensity * 0.4) : particleDensity;
+  }, [particleDensity, lowEndDevice]);
+
+  // Optimize connection distance based on device capability
+  const optimizedDistance = useMemo(() => {
+    return lowEndDevice ? Math.round(connectionDistance * 0.7) : connectionDistance;
+  }, [connectionDistance, lowEndDevice]);
 
   useEffect(() => {
+    // Check if device is low-end
+    setLowEndDevice(isLowEndDevice());
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { alpha: true });
     if (!ctx) return;
 
     // Set canvas dimensions
@@ -66,7 +81,7 @@ const ParticleNetwork = ({
     // Create particles
     const createParticles = () => {
       const { width, height } = canvasSizeRef.current;
-      const particleCount = Math.floor((width * height) / (10000 / particleDensity));
+      const particleCount = Math.floor((width * height) / (15000 / optimizedDensity));
       const particles: Particle[] = [];
 
       for (let i = 0; i < particleCount; i++) {
@@ -84,53 +99,63 @@ const ParticleNetwork = ({
       particlesRef.current = particles;
     };
 
-    // Draw particles and connections
-    const draw = () => {
+    // Throttled draw function to limit rendering
+    const drawThrottled = throttle(() => {
       if (!ctx) return;
       const { width, height } = canvasSizeRef.current;
-
+      
+      // Clear canvas
       ctx.clearRect(0, 0, width, height);
       
       const particles = particlesRef.current;
       
-      // Draw connections
-      for (let i = 0; i < particles.length; i++) {
-        const p1 = particles[i];
-        
-        // Draw connections between particles
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j];
-          const dx = p1.x - p2.x;
-          const dy = p1.y - p2.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+      // Draw connections - only on higher-end devices or with fewer particles
+      if (!lowEndDevice || particles.length < 50) {
+        for (let i = 0; i < particles.length; i++) {
+          const p1 = particles[i];
           
-          if (distance < connectionDistance) {
-            ctx.beginPath();
-            ctx.strokeStyle = connectionColor;
-            ctx.lineWidth = connectionWidth;
-            ctx.globalAlpha = (1 - distance / connectionDistance) * connectionOpacity;
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(p2.x, p2.y);
-            ctx.stroke();
-            ctx.globalAlpha = 1;
+          // Limit connections to improve performance
+          const connectionLimit = lowEndDevice ? 3 : 5;
+          let connectionsDrawn = 0;
+          
+          // Draw connections between particles
+          for (let j = i + 1; j < particles.length; j++) {
+            if (connectionsDrawn >= connectionLimit) break;
+            
+            const p2 = particles[j];
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < optimizedDistance) {
+              ctx.beginPath();
+              ctx.strokeStyle = connectionColor;
+              ctx.lineWidth = connectionWidth;
+              ctx.globalAlpha = (1 - distance / optimizedDistance) * connectionOpacity;
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+              ctx.globalAlpha = 1;
+              connectionsDrawn++;
+            }
           }
-        }
-        
-        // Draw connection to mouse if interactive
-        if (interactive && mouseRef.current.isActive) {
-          const dx = p1.x - mouseRef.current.x;
-          const dy = p1.y - mouseRef.current.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
           
-          if (distance < connectionDistance * 1.5) {
-            ctx.beginPath();
-            ctx.strokeStyle = connectionColor;
-            ctx.lineWidth = connectionWidth * 1.5;
-            ctx.globalAlpha = (1 - distance / (connectionDistance * 1.5)) * connectionOpacity * 1.5;
-            ctx.moveTo(p1.x, p1.y);
-            ctx.lineTo(mouseRef.current.x, mouseRef.current.y);
-            ctx.stroke();
-            ctx.globalAlpha = 1;
+          // Draw connection to mouse if interactive
+          if (interactive && mouseRef.current.isActive && !lowEndDevice) {
+            const dx = p1.x - mouseRef.current.x;
+            const dy = p1.y - mouseRef.current.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < optimizedDistance * 1.5) {
+              ctx.beginPath();
+              ctx.strokeStyle = connectionColor;
+              ctx.lineWidth = connectionWidth * 1.5;
+              ctx.globalAlpha = (1 - distance / (optimizedDistance * 1.5)) * connectionOpacity * 1.5;
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(mouseRef.current.x, mouseRef.current.y);
+              ctx.stroke();
+              ctx.globalAlpha = 1;
+            }
           }
         }
       }
@@ -150,7 +175,11 @@ const ParticleNetwork = ({
         if (particle.x < 0 || particle.x > width) particle.vx *= -1;
         if (particle.y < 0 || particle.y > height) particle.vy *= -1;
       }
-      
+    }, lowEndDevice ? 33 : 16); // 30fps for low-end, 60fps for high-end
+    
+    // Animation loop
+    const draw = () => {
+      drawThrottled();
       animationRef.current = requestAnimationFrame(draw);
     };
 
@@ -160,8 +189,8 @@ const ParticleNetwork = ({
       createParticles();
     };
 
-    // Mouse interaction
-    const handleMouseMove = (e: MouseEvent) => {
+    // Mouse interaction - throttled for performance
+    const handleMouseMove = throttle((e: MouseEvent) => {
       if (!interactive) return;
       
       const rect = canvas.getBoundingClientRect();
@@ -171,7 +200,7 @@ const ParticleNetwork = ({
         y: (e.clientY - rect.top) * dpr,
         isActive: true
       };
-    };
+    }, 50); // 20 updates per second max
 
     const handleMouseLeave = () => {
       mouseRef.current.isActive = false;
@@ -184,14 +213,14 @@ const ParticleNetwork = ({
 
     // Event listeners
     window.addEventListener('resize', handleResize);
-    if (interactive) {
+    if (interactive && !lowEndDevice) {
       canvas.addEventListener('mousemove', handleMouseMove);
       canvas.addEventListener('mouseleave', handleMouseLeave);
     }
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      if (interactive) {
+      if (interactive && !lowEndDevice) {
         canvas.removeEventListener('mousemove', handleMouseMove);
         canvas.removeEventListener('mouseleave', handleMouseLeave);
       }
@@ -200,23 +229,38 @@ const ParticleNetwork = ({
   }, [
     minSize, 
     maxSize, 
-    particleDensity, 
+    optimizedDensity, 
     particleColor, 
     speed, 
     connectionOpacity, 
     connectionWidth, 
-    connectionDistance,
+    optimizedDistance,
     connectionColor,
-    interactive
+    interactive,
+    lowEndDevice
   ]);
+
+  // For very low-end devices in dev mode, show a simplified version
+  if (lowEndDevice && process.env.NODE_ENV === 'development') {
+    return (
+      <div className={`w-full h-full ${className}`} style={{ background }} />
+    );
+  }
 
   return (
     <canvas 
       ref={canvasRef} 
       className={`w-full h-full ${className}`}
-      style={{ background }}
+      style={{ 
+        background,
+        transform: 'translate3d(0,0,0)', // Hardware acceleration
+        willChange: 'transform', // Signal to browser this will animate
+      }}
     />
   );
-};
+});
+
+// Add display name for React DevTools
+ParticleNetwork.displayName = "ParticleNetwork";
 
 export default ParticleNetwork; 

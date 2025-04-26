@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="180" height="180" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4F46E5" />
+      <stop offset="100%" stop-color="#7C3AED" />
+    </linearGradient>
+    <!-- Glow effect -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Rounded square background -->
+  <rect width="180" height="180" rx="45" fill="url(#bgGradient)" />
+
+  <!-- N letter with circuit/tech styling -->
+  <g fill="white" filter="url(#glow)">
+    <!-- Main N shape -->
+    <path d="M60 50v80h12V74L120 130h12V50h-12v56L72 50z" />
+    
+    <!-- Circuit nodes/dots -->
+    <circle cx="60" cy="50" r="7" />
+    <circle cx="72" cy="50" r="5" />
+    <circle cx="60" cy="130" r="7" />
+    <circle cx="120" cy="130" r="7" />
+    <circle cx="132" cy="50" r="7" />
+    <circle cx="132" cy="130" r="5" />
+    
+    <!-- Circuit lines -->
+    <rect x="45" y="50" width="13" height="4" />
+    <rect x="132" y="50" width="13" height="4" />
+    <rect x="45" y="130" width="13" height="4" />
+    <rect x="132" y="130" width="13" height="4" />
+  </g>
+  
+  <!-- Sparkles -->
+  <circle cx="45" cy="70" r="3" fill="white" opacity="0.8" />
+  <circle cx="135" cy="90" r="3" fill="white" opacity="0.8" />
+  <circle cx="55" cy="110" r="3" fill="white" opacity="0.8" />
+</svg> 

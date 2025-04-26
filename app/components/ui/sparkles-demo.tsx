@@ -1,8 +1,15 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { SparklesCore } from "@/app/components/ui/sparkles";
+import { isLowEndDevice } from "@/app/lib/performance";
 
 export function NibsolHero() {
+  const [reducedMotion, setReducedMotion] = useState(false);
+  
+  useEffect(() => {
+    setReducedMotion(isLowEndDevice());
+  }, []);
+  
   return (
     <div className="h-[40rem] w-full bg-black flex flex-col items-center justify-center overflow-hidden rounded-md">
       <h1 className="md:text-7xl text-3xl lg:text-9xl font-bold text-center text-white relative z-20">
@@ -18,14 +25,15 @@ export function NibsolHero() {
         <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-purple-500 to-transparent h-[5px] w-1/4 blur-sm" />
         <div className="absolute inset-x-60 top-0 bg-gradient-to-r from-transparent via-purple-500 to-transparent h-px w-1/4" />
 
-        {/* Core component */}
+        {/* Core component - reduced particles */}
         <SparklesCore
           background="transparent"
           minSize={0.4}
           maxSize={1}
-          particleDensity={1200}
+          particleDensity={reducedMotion ? 40 : 60}
           className="w-full h-full"
           particleColor="#FFFFFF"
+          speed={reducedMotion ? 2 : 3}
         />
 
         {/* Radial Gradient to prevent sharp edges */}
@@ -36,6 +44,12 @@ export function NibsolHero() {
 }
 
 export function NibsolFeatures() {
+  const [reducedMotion, setReducedMotion] = useState(false);
+  
+  useEffect(() => {
+    setReducedMotion(isLowEndDevice());
+  }, []);
+  
   return (
     <div className="h-[40rem] relative w-full bg-slate-950 flex flex-col items-center justify-center overflow-hidden rounded-md">
       <div className="w-full absolute inset-0 h-screen">
@@ -44,10 +58,10 @@ export function NibsolFeatures() {
           background="transparent"
           minSize={0.6}
           maxSize={1.4}
-          particleDensity={100}
+          particleDensity={reducedMotion ? 30 : 50}
           className="w-full h-full"
           particleColor="#FFFFFF"
-          speed={1}
+          speed={reducedMotion ? 0.5 : 1}
         />
       </div>
       <h1 className="md:text-7xl text-3xl lg:text-9xl font-bold text-center text-white relative z-20">
@@ -72,6 +86,12 @@ export function NibsolFeatures() {
 }
 
 export function NibsolVision() {
+  const [reducedMotion, setReducedMotion] = useState(false);
+  
+  useEffect(() => {
+    setReducedMotion(isLowEndDevice());
+  }, []);
+  
   return (
     <div className="h-[40rem] relative w-full bg-black flex flex-col items-center justify-center overflow-hidden rounded-md">
       <div className="w-full absolute inset-0 h-screen">
@@ -80,10 +100,10 @@ export function NibsolVision() {
           background="transparent"
           minSize={0.6}
           maxSize={1.4}
-          particleDensity={100}
+          particleDensity={reducedMotion ? 30 : 50}
           className="w-full h-full"
           particleColor="#00A3FF"
-          speed={0.5}
+          speed={reducedMotion ? 0.3 : 0.5}
         />
       </div>
       <div className="flex flex-col items-center justify-center gap-4 relative z-20">
